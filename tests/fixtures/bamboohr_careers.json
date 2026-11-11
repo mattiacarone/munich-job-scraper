@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "totalCount": 2
+  },
+  "result": [
+    {
+      "id": 98765,
+      "jobTitle": "Technical Account Manager",
+      "department": "Customer Success",
+      "location": {
+        "city": "Munich",
+        "state": "Bavaria",
+        "country": "Germany"
+      },
+      "isRemote": false
+    },
+    {
+      "id": 98766,
+      "jobTitle": "Integration Specialist",
+      "department": "Solutions Engineering",
+      "location": {
+        "city": "Munich",
+        "state": "Bavaria",
+        "country": "Germany"
+      },
+      "isRemote": true
+    }
+  ]
+}

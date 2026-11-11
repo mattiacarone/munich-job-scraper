@@ -1,0 +1,282 @@
+{
+  "join": {
+    "tried": 7,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "linkedin": {
+    "tried": 185,
+    "SUBMITTED": 54,
+    "CAPTCHA": 10,
+    "ACCOUNT-ONLY": 25,
+    "submitted_pct": 29.2,
+    "apply_kind": null
+  },
+  "englishjobs.de": {
+    "tried": 5,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "career.accilium.com": {
+    "tried": 2,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "ashby": {
+    "tried": 99,
+    "SUBMITTED": 58,
+    "CAPTCHA": 4,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 58.6,
+    "apply_kind": "auto"
+  },
+  "greenhouse": {
+    "tried": 101,
+    "SUBMITTED": 58,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 57.4,
+    "apply_kind": "auto"
+  },
+  "almavivadebelgique.be": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "smartrecruiters": {
+    "tried": 5,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "arbeitsagentur.de": {
+    "tried": 8,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "recruitee": {
+    "tried": 5,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "reddit.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "auterion.com": {
+    "tried": 1,
+    "SUBMITTED": 1,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 100.0,
+    "apply_kind": null
+  },
+  "lever": {
+    "tried": 22,
+    "SUBMITTED": 0,
+    "CAPTCHA": 5,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": "captcha"
+  },
+  "personio": {
+    "tried": 15,
+    "SUBMITTED": 6,
+    "CAPTCHA": 9,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 40.0,
+    "apply_kind": null
+  },
+  "canonical.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "arbeitnow.nl": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "softgarden": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "coreweave.com": {
+    "tried": 2,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "databricks.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "unknown": {
+    "tried": 4,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "teamtailor": {
+    "tried": 9,
+    "SUBMITTED": 2,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 22.2,
+    "apply_kind": null
+  },
+  "careers.distribusion.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 1,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "weworkremotely.com": {
+    "tried": 7,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "workable": {
+    "tried": 10,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "yourfirm.de": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "inverto.dvinci-hr.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "career.limeflight.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "jobs.instaffo.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "producthunt.com": {
+    "tried": 3,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "careers.nebius.com": {
+    "tried": 1,
+    "SUBMITTED": 1,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 100.0,
+    "apply_kind": null
+  },
+  "career.quantum-systems.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 1,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "careers.replika.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "jobware.de": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "remoteok.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  },
+  "rossaus.com": {
+    "tried": 1,
+    "SUBMITTED": 0,
+    "CAPTCHA": 0,
+    "ACCOUNT-ONLY": 0,
+    "submitted_pct": 0.0,
+    "apply_kind": null
+  }
+}

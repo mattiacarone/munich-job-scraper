@@ -1,0 +1,27 @@
+# install_autostart.ps1
+# Registers a Windows Scheduled Task named "MunichScraper" triggered at user logon.
+# Runs scraper.ps1 start in a hidden window.
+# Note: Do not execute this script automatically; Mattia decides whether to run it.
+
+$ErrorActionPreference = "Stop"
+
+$taskName = "MunichScraper"
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$scraperPs1 = Join-Path $scriptDir "scraper.ps1"
+
+if (-not (Test-Path $scraperPs1)) {
+    Write-Error "scraper.ps1 not found at $scraperPs1"
+    exit 1
+}
+
+Write-Host "Registering Scheduled Task '$taskName'..."
+
+$action = New-ScheduledTaskAction -Execute "powershell" -Argument "-WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\Mattia\munichScraper\scraper.ps1 start"
+$trigger = New-ScheduledTaskTrigger -AtLogOn
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Days 365) -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+
+Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force
+
+Write-Host "Scheduled task '$taskName' registered successfully."
+

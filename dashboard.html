@@ -1,0 +1,4033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>munichScraper • Run Dashboard & Improvement Engine</title>
+<style>
+:root {
+  --bg: #0b0f17;
+  --bg-card: #121824;
+  --bg-card-hover: #172030;
+  --border: #1e293b;
+  --border-light: #334155;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --accent: #38bdf8;
+  --accent-glow: rgba(56, 189, 248, 0.15);
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --purple: #a855f7;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  padding: 24px;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-badge {
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.subhead {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.pill.success { border-color: rgba(16, 185, 129, 0.4); color: var(--success); background: var(--success-bg); }
+.pill.warning { border-color: rgba(245, 158, 11, 0.4); color: var(--warning); background: var(--warning-bg); }
+.pill.accent { border-color: rgba(56, 189, 248, 0.4); color: var(--accent); background: var(--accent-glow); }
+
+/* Navigation Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tab-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--border-light);
+}
+
+.kpi-card.highlight::before { background: var(--accent); }
+.kpi-card.green::before { background: var(--success); }
+.kpi-card.purple::before { background: var(--purple); }
+
+.kpi-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.kpi-val {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.kpi-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* Section Headings */
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Cards Layout */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 900px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tr:hover td {
+  background: var(--bg-card-hover);
+}
+
+/* Progress bars */
+.bar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+/* Improvement Cards */
+.improvement-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.improvement-card.high { border-left-color: var(--warning); }
+.improvement-card.medium { border-left-color: var(--accent); }
+.improvement-card.info { border-left-color: var(--success); }
+
+.imp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.imp-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.imp-badge.high { background: var(--warning-bg); color: var(--warning); }
+.imp-badge.medium { background: var(--accent-glow); color: var(--accent); }
+.imp-badge.info { background: var(--success-bg); color: var(--success); }
+
+.imp-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.imp-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.imp-action {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Jobs Explorer */
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 260px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.filter-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.btn {
+  background: var(--accent);
+  color: #0b0f17;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  background: #7dd3fc;
+}
+
+.score-badge {
+  font-weight: 800;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.score-high { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.score-mid { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.score-base { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+
+.skill-tag {
+  display: inline-block;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin: 2px 2px 2px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo-group">
+      <div class="logo-badge">MUNICH SCOUT</div>
+      <div>
+        <h1>Pipeline Run Dashboard & Improvement Engine</h1>
+        <div class="subhead">Mattia Carone Discovery Layer • Last Run: 2026-11-10 18:14:37 UTC</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="pill accent">🔥 Firecrawl: Active credits left</div>
+      <div class="pill success">🎯 420 Passing Roles</div>
+      <div class="pill">⚡ 100% Contract Valid</div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tab-overview')">📊 Overview & KPIs</button>
+    <button class="tab-btn" onclick="openTab('tab-improvements')">💡 Improvement Engine (3)</button>
+    <button class="tab-btn" onclick="openTab('tab-jobs')">💼 Job Explorer (120)</button>
+    <button class="tab-btn" onclick="openTab('tab-sources')">🌐 Source Yields</button>
+    <button class="tab-btn" onclick="openTab('tab-gates')">🛑 Gate Funnel</button>
+  </div>
+
+  <!-- TAB 1: OVERVIEW -->
+  <div id="tab-overview" class="tab-pane active">
+    <div class="kpi-grid">
+      <div class="kpi-card highlight">
+        <div class="kpi-label">Active Passing Roles</div>
+        <div class="kpi-val" style="color: var(--accent);">420</div>
+        <div class="kpi-sub">Passes all 12 gates & score &gt; 0</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Munich Metro Scope</div>
+        <div class="kpi-val" style="color: var(--success);">235</div>
+        <div class="kpi-sub">Munich + 35 suburbs & postal codes</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">Auto-Apply Ready</div>
+        <div class="kpi-val" style="color: var(--purple);">355</div>
+        <div class="kpi-sub">Ashby, Greenhouse, Personio forms</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Germany Remote</div>
+        <div class="kpi-val">81</div>
+        <div class="kpi-sub">+ 104 Europe Remote</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Stored Jobs</div>
+        <div class="kpi-val">24875</div>
+        <div class="kpi-sub">2200 marked closed/stale</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="section-title">📍 Location Scope Breakdown</div>
+        <table>
+          <thead>
+            <tr><th>Scope</th><th>Passing Roles</th><th>Share</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Munich Metro (Local/Hybrid)</strong></td>
+              <td>235</td>
+              <td><span class="bar-track"><span class="bar-fill" style="width: 56%;"></span></span></td>
+            </tr>
+            <tr>
+              <td><strong>Remote (Germany Eligible)</strong></td>
+              <td>81</td>
+              <td><span class="bar-track"><span class="bar-fill" style="width: 19%; background: #38bdf8;"></span></span></td>
+            </tr>
+            <tr>
+              <td><strong>Remote (Europe / EMEA)</strong></td>
+              <td>104</td>
+              <td><span class="bar-track"><span class="bar-fill" style="width: 25%; background: #a855f7;"></span></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">🚀 Apply Route Distribution</div>
+        <table>
+          <thead>
+            <tr><th>Route Provider</th><th>Passing Roles</th><th>Mode</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>greenhouse</strong></td><td>123</td><td><span class='pill success'>auto-form</span></td></tr><tr><td><strong>ashby</strong></td><td>123</td><td><span class='pill success'>auto-form</span></td></tr><tr><td><strong>company_site</strong></td><td>55</td><td><span class='pill success'>auto-form</span></td></tr><tr><td><strong>personio</strong></td><td>28</td><td><span class='pill success'>auto-form</span></td></tr><tr><td><strong>lever</strong></td><td>28</td><td><span class='pill success'>auto-form</span></td></tr><tr><td><strong>smartrecruiters</strong></td><td>18</td><td><span class='pill success'>auto-form</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: IMPROVEMENTS -->
+  <div id="tab-improvements" class="tab-pane">
+    <div class="section-title">🔍 Data-Driven Pipeline Improvement Points</div>
+    <div class="subhead" style="margin-bottom: 20px;">Diagnosed directly from jobs.db and cycle metrics to systematically increase English Munich roles.</div>
+
+    
+    <div class="improvement-card high">
+      <div class="imp-header">
+        <span class="imp-badge high">Aggregator Rescue • HIGH IMPACT</span>
+      </div>
+      <div class="imp-title">18 postings parked by Account-Only login walls</div>
+      <div class="imp-desc">StepStone, LinkedIn, and job boards blocked 18 roles behind login accounts. Our reverse-ATS lookup resolves companies with known ATS boards. Expanding employer slug matching can recover dozens of these roles directly.</div>
+      <div class="imp-action">💡 <strong>Action:</strong> Ensure high-match companies on StepStone have their ATS board slugs in discovered_boards.json</div>
+    </div>
+    
+    <div class="improvement-card medium">
+      <div class="imp-header">
+        <span class="imp-badge medium">ATS Board Multiplier • MEDIUM IMPACT</span>
+      </div>
+      <div class="imp-title">SmartRecruiters &amp; Teamtailor have highest yield per board (~1.3+ jobs/slug)</div>
+      <div class="imp-desc">Direct ATS feeds account for &gt;85% of all passing applications at 0 credit cost and zero bot blocking. Adding more Munich tech scaleup slugs to data/discovered_boards.json generates permanent recurring pipeline volume.</div>
+      <div class="imp-action">💡 <strong>Action:</strong> Target Munich tech scaleups using Greenhouse, SmartRecruiters, Ashby, and Personio</div>
+    </div>
+    
+    <div class="improvement-card info">
+      <div class="imp-header">
+        <span class="imp-badge info">Language Precision • INFO IMPACT</span>
+      </div>
+      <div class="imp-title">421 non-English roles cleanly filtered (293 German text, 128 mandatory German required)</div>
+      <div class="imp-desc">The dual-stage German gate successfully protected 421 application attempts from being wasted on German-mandatory positions, keeping the pipeline 100% English-friendly.</div>
+      <div class="imp-action">💡 <strong>Action:</strong> No action needed: gates are operating with strict accuracy</div>
+    </div>
+    
+  </div>
+
+  <!-- TAB 3: JOBS EXPLORER -->
+  <div id="tab-jobs" class="tab-pane">
+    <div class="search-bar">
+      <input type="text" id="jobSearch" class="search-input" placeholder="Search by title, company, or skill (e.g. Solution, Dropbox, API)..." onkeyup="filterJobs()">
+      <select id="scopeFilter" class="filter-select" onchange="filterJobs()">
+        <option value="">All Locations</option>
+        <option value="munich">Munich Metro Only</option>
+        <option value="remote-de">Remote Germany</option>
+        <option value="remote-eu">Remote Europe</option>
+      </select>
+      <select id="routeFilter" class="filter-select" onchange="filterJobs()">
+        <option value="">All Routes</option>
+        <option value="auto">Auto-Submit Only</option>
+      </select>
+    </div>
+
+    <div class="panel">
+      <table id="jobsTable">
+        <thead>
+          <tr>
+            <th>Score</th>
+            <th>Company & Role</th>
+            <th>Location</th>
+            <th>Matched Skills</th>
+            <th>Route</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="jobsTbody">
+          
+          <tr data-title="partner solution engineer – emea central" data-company="servicenow" data-scope="munich" data-kind="auto" data-skills="servicenow saas generative ai workshops solution design pre-sales">
+            <td>
+              <span class="score-badge score-high">
+                147.1
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Partner Solution Engineer – EMEA Central</div>
+              <div style="font-size: 12px; color: var(--text-muted);">ServiceNow <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, , Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>ServiceNow</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>Generative AI</span><span class='skill-tag'>workshops</span><span class='skill-tag'>solution design</span><span class='skill-tag'>pre-sales</span>
+            </td>
+            <td>
+              <span class="pill success">smartrecruiters</span>
+            </td>
+            <td>
+              <a href="https://jobs.smartrecruiters.com/servicenow/744000152732339" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior solution engineer (pre-sales)" data-company="apollo graphql" data-scope="munich" data-kind="auto" data-skills="saas mcp workshops solution design pre-sales gtm">
+            <td>
+              <span class="score-badge score-high">
+                145.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Solution Engineer (Pre-sales)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Apollo GraphQL </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>MCP</span><span class='skill-tag'>workshops</span><span class='skill-tag'>solution design</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/apollo-graphql/f3c918e6-ac7f-4d9f-bc62-73a58b73ff4a" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="crm software engineer" data-company="partner one capital" data-scope="munich" data-kind="auto" data-skills="systems integration middleware rest apis rest api salesforce hubspot">
+            <td>
+              <span class="score-badge score-high">
+                137.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">CRM Software Engineer</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Partner One Capital </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>systems integration</span><span class='skill-tag'>middleware</span><span class='skill-tag'>REST APIs</span><span class='skill-tag'>REST API</span><span class='skill-tag'>Salesforce</span><span class='skill-tag'>HubSpot</span>
+            </td>
+            <td>
+              <span class="pill success">workable</span>
+            </td>
+            <td>
+              <a href="https://apply.workable.com/j/62088C1D0B" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior solution consultant - crm &amp; agentic ai" data-company="servicenow" data-scope="munich" data-kind="auto" data-skills="servicenow crm agentic ai solution consulting pre-sales">
+            <td>
+              <span class="score-badge score-high">
+                131.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Solution Consultant - CRM &amp; Agentic AI</div>
+              <div style="font-size: 12px; color: var(--text-muted);">ServiceNow <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>ServiceNow</span><span class='skill-tag'>CRM</span><span class='skill-tag'>Agentic AI</span><span class='skill-tag'>solution consulting</span><span class='skill-tag'>pre-sales</span>
+            </td>
+            <td>
+              <span class="pill success">smartrecruiters</span>
+            </td>
+            <td>
+              <a href="https://jobs.smartrecruiters.com/servicenow/744000160684520" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="avp, solution consulting crm emea" data-company="servicenow" data-scope="munich" data-kind="auto" data-skills="servicenow crm saas agentic ai solution consulting pre-sales">
+            <td>
+              <span class="score-badge score-high">
+                127.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">AVP, Solution Consulting CRM EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">ServiceNow <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, , Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>ServiceNow</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>Agentic AI</span><span class='skill-tag'>solution consulting</span><span class='skill-tag'>pre-sales</span>
+            </td>
+            <td>
+              <span class="pill success">smartrecruiters</span>
+            </td>
+            <td>
+              <a href="https://jobs.smartrecruiters.com/servicenow/744000158091734" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager — japanese &amp;amp; korean speaking (remote)" data-company="dropbox" data-scope="munich" data-kind="auto" data-skills="crm saas generative ai business requirements customer success">
+            <td>
+              <span class="score-badge score-high">
+                118.9
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager — Japanese &amp;amp; Korean Speaking (Remote)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Dropbox </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>Generative AI</span><span class='skill-tag'>business requirements</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">company_site</span>
+            </td>
+            <td>
+              <a href="https://www.dropbox.jobs/en/our-blog/employee-stories/the-era-of-durable-skills-what-the-data-tells-us-about-thriving-in-change/" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="global salesforce business analyst, commercial excellence" data-company="vitrolife" data-scope="munich" data-kind="auto" data-skills="salesforce crm business requirements workshops user stories agile">
+            <td>
+              <span class="score-badge score-high">
+                118.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Global Salesforce Business Analyst, Commercial Excellence</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Vitrolife </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Landshut, Germany, DE; Paterna, Spain, ES; Västra Frölunda, Sweden, SE; Guildford, UK, GB</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>business requirements</span><span class='skill-tag'>workshops</span><span class='skill-tag'>user stories</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill success">company_site</span>
+            </td>
+            <td>
+              <a href="https://career.vitrolifegroup.com/jobs/8622638-global-salesforce-business-analyst-commercial-excellence" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager (based in: germany, the netherlands, the uk or spain)" data-company="propeller" data-scope="remote-eu" data-kind="auto" data-skills="salesforce hubspot saas customer success">
+            <td>
+              <span class="score-badge score-high">
+                114.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager (Based in: Germany, the Netherlands, the UK or Spain)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Propeller </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Europe)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>HubSpot</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">workable</span>
+            </td>
+            <td>
+              <a href="https://apply.workable.com/j/D5C9849FEC" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior software engineer (agentic ai &amp; agentic engineering)" data-company="kipu quantum" data-scope="munich" data-kind="auto" data-skills="rest apis agentic ai model context protocol mcp generative ai ci/cd">
+            <td>
+              <span class="score-badge score-high">
+                109.2
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Software Engineer (Agentic AI &amp; Agentic Engineering)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Kipu Quantum </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>REST APIs</span><span class='skill-tag'>Agentic AI</span><span class='skill-tag'>Model Context Protocol</span><span class='skill-tag'>MCP</span><span class='skill-tag'>Generative AI</span><span class='skill-tag'>CI/CD</span>
+            </td>
+            <td>
+              <span class="pill success">personio</span>
+            </td>
+            <td>
+              <a href="https://kipu-quantum.jobs.personio.de/job/2879536" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="ai deployment strategist, science - emea" data-company="mistral.ai" data-scope="munich" data-kind="auto" data-skills="ai adoption workshops solution design cross-functional collaboration presales customer success">
+            <td>
+              <span class="score-badge score-high">
+                107.6
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">AI Deployment Strategist, Science - EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Mistral.Ai </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Paris; Amsterdam; Munich; London</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>AI adoption</span><span class='skill-tag'>workshops</span><span class='skill-tag'>solution design</span><span class='skill-tag'>cross-functional collaboration</span><span class='skill-tag'>presales</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/mistral.ai/ea944567-a5ea-4628-afa1-2c1354807a75" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager" data-company="customer.io" data-scope="remote-eu" data-kind="auto" data-skills="saas ai adoption customer success">
+            <td>
+              <span class="score-badge score-high">
+                106.9
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Customer.io </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">APAC Remote; EMEA Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>AI adoption</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/customerio/jobs/8242239" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="enterprise account executive - turkish speaking" data-company="elliptic" data-scope="remote-de" data-kind="auto" data-skills="hubspot crm saas agentic ai generative ai customer success">
+            <td>
+              <span class="score-badge score-high">
+                105.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Enterprise Account Executive - Turkish Speaking</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Elliptic </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Frankfurt (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>Agentic AI</span><span class='skill-tag'>Generative AI</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/elliptic/a90fe1b2-2af1-4932-9fb5-8950d9697575" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager emea (m/w/d)" data-company="appsamurai" data-scope="munich" data-kind="auto" data-skills="salesforce saas workshops customer success">
+            <td>
+              <span class="score-badge score-high">
+                104.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager EMEA (m/w/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Appsamurai </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>workshops</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/appsamurai/58808ae9-9752-4e83-a181-572fc90302c7" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager, emea" data-company="notabene" data-scope="remote-eu" data-kind="auto" data-skills="hubspot saas customer success">
+            <td>
+              <span class="score-badge score-high">
+                102.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager, EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Notabene <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">EMEA</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/notabene/86d6876a-271c-4eb5-846b-e1bff56d7b46" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager (m/f/d), strategic accounts" data-company="think-cell software" data-scope="munich" data-kind="auto" data-skills="saas workshops business analysis customer success">
+            <td>
+              <span class="score-badge score-high">
+                102.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager (m/f/d), Strategic Accounts</div>
+              <div style="font-size: 12px; color: var(--text-muted);">think-cell Software </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>workshops</span><span class='skill-tag'>business analysis</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.eu.greenhouse.io/thinkcellsoftware/jobs/5013527101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="solutions integration architect - ariba" data-company="zip" data-scope="remote-de" data-kind="auto" data-skills="ipaas solution consulting pre-sales">
+            <td>
+              <span class="score-badge score-high">
+                102.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Solutions Integration Architect - Ariba</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Zip <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote - Germany; Remote - Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>iPaaS</span><span class='skill-tag'>solution consulting</span><span class='skill-tag'>pre-sales</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/zip/042dc503-720f-4c32-a789-ccc8699ef267" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success engineer" data-company="vclusterlabs" data-scope="remote-eu" data-kind="auto" data-skills="salesforce saas workshops customer success gitlab">
+            <td>
+              <span class="score-badge score-high">
+                100.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Engineer</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Vclusterlabs <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">EMEA (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>workshops</span><span class='skill-tag'>customer success</span><span class='skill-tag'>GitLab</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/vClusterLabs/b071e601-0352-42c5-aa35-5597fd7a044d" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="manager, forward deployed engineering" data-company="databricks" data-scope="munich" data-kind="auto" data-skills="ai transformation generative ai genai stakeholder management customer success azure">
+            <td>
+              <span class="score-badge score-high">
+                94.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Manager, Forward Deployed Engineering</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Databricks <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>AI transformation</span><span class='skill-tag'>Generative AI</span><span class='skill-tag'>GenAI</span><span class='skill-tag'>stakeholder management</span><span class='skill-tag'>customer success</span><span class='skill-tag'>Azure</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://databricks.com/company/careers/open-positions/job?gh_jid=8899736002" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior salesforce developer, field service" data-company="omnidian" data-scope="munich" data-kind="auto" data-skills="event-driven rest apis soql salesforce saas enterprise applications">
+            <td>
+              <span class="score-badge score-high">
+                93.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Salesforce Developer, Field Service</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Omnidian <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>event-driven</span><span class='skill-tag'>REST APIs</span><span class='skill-tag'>SOQL</span><span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>enterprise applications</span>
+            </td>
+            <td>
+              <span class="pill success">company_site</span>
+            </td>
+            <td>
+              <a href="https://omnidian.slab.com/posts/internal-transfer-job-application-process-lez7fwks" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="sales engineer (fully remote)" data-company="soracom" data-scope="remote-eu" data-kind="auto" data-skills="saas solution design pre-sales presales azure">
+            <td>
+              <span class="score-badge score-high">
+                93.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Sales Engineer (Fully Remote)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">SORACOM </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Europe)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>solution design</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>presales</span><span class='skill-tag'>Azure</span>
+            </td>
+            <td>
+              <span class="pill success">workable</span>
+            </td>
+            <td>
+              <a href="https://apply.workable.com/j/34B1EC2D7F" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="sales enablement manager" data-company="emnify" data-scope="munich" data-kind="auto" data-skills="salesforce crm saas customer success go-to-market gtm">
+            <td>
+              <span class="score-badge score-high">
+                91.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Sales Enablement Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">emnify <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://www.emnify-jobs.com/emnify/?gh_jid=5031177101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="partner solutions architect, sap, aws emea apo partner solutions architecture, enterprise applications" data-company="amazon" data-scope="munich" data-kind="account_portal" data-skills="event-driven enterprise applications agentic ai generative ai emerging technology workshops">
+            <td>
+              <span class="score-badge score-high">
+                90.9
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Partner Solutions Architect, SAP, AWS EMEA APO Partner Solutions Architecture, Enterprise Applications</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Amazon </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, DEU</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>event-driven</span><span class='skill-tag'>enterprise applications</span><span class='skill-tag'>Agentic AI</span><span class='skill-tag'>Generative AI</span><span class='skill-tag'>emerging technology</span><span class='skill-tag'>workshops</span>
+            </td>
+            <td>
+              <span class="pill ">amazon_jobs</span>
+            </td>
+            <td>
+              <a href="https://www.amazon.jobs/en/jobs/10583772/partner-solutions-architect-sap-aws-emea-apo-partner-solutions-architecture-enterprise-applications" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="enterprise customer success manager (french speaker)" data-company="canonical" data-scope="remote-eu" data-kind="auto" data-skills="salesforce customer success agile">
+            <td>
+              <span class="score-badge score-high">
+                87.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Enterprise Customer Success Manager (French speaker)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Canonical </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Worldwide)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>customer success</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/canonical/jobs/6856788" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="scaled customer success manager" data-company="dropbox" data-scope="munich" data-kind="auto" data-skills="crm saas customer success">
+            <td>
+              <span class="score-badge score-high">
+                85.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Scaled Customer Success Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Dropbox <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">company_site</span>
+            </td>
+            <td>
+              <a href="https://www.dropbox.jobs/en/our-blog/employee-stories/the-era-of-durable-skills-what-the-data-tells-us-about-thriving-in-change/" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="account executive, nas product specialist" data-company="rubrik job board" data-scope="munich" data-kind="auto" data-skills="salesforce saas ai transformation customer success">
+            <td>
+              <span class="score-badge score-high">
+                82.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Account Executive, NAS Product Specialist</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Rubrik Job Board </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>AI transformation</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">email</span>
+            </td>
+            <td>
+              <a href="mailto:hr@rubrik.com" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager (m/f/x) | jobs" data-company="beroe x nnamu ..." data-scope="munich" data-kind="auto" data-skills="saas customer success">
+            <td>
+              <span class="score-badge score-high">
+                82.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager (m/f/x) | Jobs</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Beroe x nnamu ... </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">personio</span>
+            </td>
+            <td>
+              <a href="https://beroe-inc.jobs.personio.com/job/2837966" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="database support engineer (emea)" data-company="supabase" data-scope="munich" data-kind="auto" data-skills="pre-sales customer success">
+            <td>
+              <span class="score-badge score-high">
+                82.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Database Support Engineer (EMEA)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Supabase </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">EMEA</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>pre-sales</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/supabase/f18b1173-51c3-4ff6-bcda-89f8111931f4" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="account executive emea" data-company="litmus" data-scope="remote-de" data-kind="auto" data-skills="salesforce ai adoption solution design pre-sales">
+            <td>
+              <span class="score-badge score-high">
+                82.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Account Executive EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Litmus <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>AI adoption</span><span class='skill-tag'>solution design</span><span class='skill-tag'>pre-sales</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/litmus/12347078-cbb5-4fa6-a0a9-f030ab28283f" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager - pharmacovigilance" data-company="veeva" data-scope="remote-de" data-kind="auto" data-skills="saas customer success">
+            <td>
+              <span class="score-badge score-mid">
+                79.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager - Pharmacovigilance</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Veeva </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany - Berlin (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/veeva/e4ac318e-ab36-4b28-9d20-c8be9c51ae96" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager, emea" data-company="jumio" data-scope="munich" data-kind="auto" data-skills="saas customer success">
+            <td>
+              <span class="score-badge score-mid">
+                79.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager, EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Jumio </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">email</span>
+            </td>
+            <td>
+              <a href="mailto:privacy@jumio.com" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="solutions engineer" data-company="planetscale" data-scope="munich" data-kind="auto" data-skills="saas workshops pre-sales azure python">
+            <td>
+              <span class="score-badge score-mid">
+                76.4
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Solutions Engineer</div>
+              <div style="font-size: 12px; color: var(--text-muted);">PlanetScale </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>workshops</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>Azure</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/planetscale/jobs/4052805009" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="solutions engineer" data-company="onebrief" data-scope="munich" data-kind="auto" data-skills="solution design presales go-to-market maven azure python">
+            <td>
+              <span class="score-badge score-mid">
+                76.4
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Solutions Engineer</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Onebrief </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>solution design</span><span class='skill-tag'>presales</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>Maven</span><span class='skill-tag'>Azure</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/onebrief/3b87e23c-e07d-4ace-b65f-84a2870ea0fb" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="solution engineer" data-company="relationalai" data-scope="remote-eu" data-kind="auto" data-skills="workshops pre-sales python">
+            <td>
+              <span class="score-badge score-mid">
+                75.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Solution Engineer</div>
+              <div style="font-size: 12px; color: var(--text-muted);">RelationalAI </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Anywhere</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>workshops</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/relationalai/jobs/6175260004" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="manager, forward deployed engineering" data-company="anthropic" data-scope="munich" data-kind="auto" data-skills="ai transformation stakeholder management pre-sales customer success">
+            <td>
+              <span class="score-badge score-mid">
+                75.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Manager, Forward Deployed Engineering</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Anthropic </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>AI transformation</span><span class='skill-tag'>stakeholder management</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/anthropic/jobs/5442048008" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="product manager (f/m/d)" data-company="idnow" data-scope="munich" data-kind="auto" data-skills="saas genai user stories customer success">
+            <td>
+              <span class="score-badge score-mid">
+                72.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Product Manager (f/m/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">IDnow <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin, Berlin, Germany; München, Bavaria, Germany; Paris, Paris, France; Rennes, Ille-et-Vilaine, France</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>GenAI</span><span class='skill-tag'>user stories</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.eu.greenhouse.io/idnow/jobs/5025588101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior software engineer, containers" data-company="chainguard" data-scope="remote-de" data-kind="auto" data-skills="model context protocol mcp go-to-market">
+            <td>
+              <span class="score-badge score-mid">
+                71.6
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Software Engineer, Containers</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Chainguard <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Canada - Remote; Germany - Remote; United Kingdom - Remote; United States - Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Model Context Protocol</span><span class='skill-tag'>MCP</span><span class='skill-tag'>go-to-market</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/chainguard/jobs/4725945006" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="partnerships manager  - cfo solutions" data-company="drivetrain" data-scope="remote-eu" data-kind="auto" data-skills="saas solution consulting customer success go-to-market gtm">
+            <td>
+              <span class="score-badge score-mid">
+                71.1
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Partnerships Manager  - CFO Solutions</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Drivetrain <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Europe (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>solution consulting</span><span class='skill-tag'>customer success</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/drivetrain/b69d76ee-730d-4ffe-8d6a-6a8ef587c6ad" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="sales account manager | protein metrics" data-company="dotmatics" data-scope="remote-de" data-kind="auto" data-skills="hubspot crm pre-sales customer success">
+            <td>
+              <span class="score-badge score-mid">
+                70.2
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Sales Account Manager | Protein Metrics</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Dotmatics </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote - Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://www.dotmatics.com/jobs/apply?gh_jid=4725609005" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="fullstack developer – taplio &amp; tweethunter" data-company="lemlist" data-scope="remote-eu" data-kind="auto" data-skills="saas mcp customer success">
+            <td>
+              <span class="score-badge score-mid">
+                70.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Fullstack Developer – Taplio &amp; TweetHunter</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Lemlist </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">European union (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>MCP</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/lemlist/8b6b8263-ad9c-4f6c-80af-545eeb7c5127" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior revenue operations manager - customer success" data-company="talon.one" data-scope="munich" data-kind="auto" data-skills="salesforce crm saas customer success go-to-market">
+            <td>
+              <span class="score-badge score-mid">
+                69.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Revenue Operations Manager - Customer Success</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Talon.One </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span><span class='skill-tag'>go-to-market</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://www.talon.one/job-listing?gh_jid=5027510101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="gtm operations manager" data-company="revenuecat" data-scope="remote-eu" data-kind="auto" data-skills="salesforce hubspot crm go-to-market gtm">
+            <td>
+              <span class="score-badge score-mid">
+                69.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">GTM Operations Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Revenuecat <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">EMEA; Americas (EST only) (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/revenuecat/94a6d4e1-1510-449c-8dea-63d4d3afcbb2" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="strategic account manager" data-company="redwoodsoftware" data-scope="remote-de" data-kind="auto" data-skills="saas pre-sales customer success">
+            <td>
+              <span class="score-badge score-mid">
+                68.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Strategic Account Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Redwoodsoftware </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany ; Germany (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/redwoodsoftware/jobs/4246976009" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer support specialist *remote* (m/f/d)" data-company="pliant" data-scope="munich" data-kind="auto" data-skills="salesforce hubspot crm">
+            <td>
+              <span class="score-badge score-mid">
+                67.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Support Specialist *remote* (m/f/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Pliant </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin, Germany (Hybrid) (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/pliant/0fa68423-d0c1-4c27-bb3d-eaa6cb804f33" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior product manager | integrations &amp; ai foundations (f/m/d)" data-company="bunch" data-scope="munich" data-kind="auto" data-skills="crm saas mcp customer success">
+            <td>
+              <span class="score-badge score-mid">
+                67.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Product Manager | Integrations &amp; AI Foundations (f/m/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Bunch <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>MCP</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/bunch/e8f7920c-332c-4363-a1ef-dedb8351b461" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="gtm engineer - sales operations crm management" data-company="pergolux" data-scope="munich" data-kind="auto" data-skills="ipaas rest apis hubspot crm gtm python">
+            <td>
+              <span class="score-badge score-mid">
+                66.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">GTM Engineer - Sales Operations CRM Management</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Pergolux </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin | Global Team</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>iPaaS</span><span class='skill-tag'>REST APIs</span><span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>GTM</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/pergolux/1ce72725-c069-43c5-9736-18dde7fdb8f5" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior software engineer — ai-native engineering (xtm foundation)" data-company="filigran" data-scope="munich" data-kind="auto" data-skills="mcp workshops">
+            <td>
+              <span class="score-badge score-mid">
+                65.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Software Engineer — AI-Native Engineering (XTM Foundation)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Filigran </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">France,  Germany,  Italy,  Spain,  UK</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>MCP</span><span class='skill-tag'>workshops</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/filigran/078b3281-6e64-4c52-82c9-c20a73dcb2fa" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="backend developer (java/spring boot, aws) – internal (m/f/d) | munich | hybrid" data-company="netlight" data-scope="munich" data-kind="auto" data-skills="rest apis git maven cloudwatch python agile">
+            <td>
+              <span class="score-badge score-mid">
+                65.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Backend Developer (Java/Spring Boot, AWS) – Internal (m/f/d) | Munich | Hybrid</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Netlight </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>REST APIs</span><span class='skill-tag'>Git</span><span class='skill-tag'>Maven</span><span class='skill-tag'>CloudWatch</span><span class='skill-tag'>Python</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/netlight/3b9f4aaa-926e-4723-82ec-396e9197c85b/apply" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="business development associate" data-company="clovirtualfashion" data-scope="munich" data-kind="auto" data-skills="crm saas emerging technology stakeholder management">
+            <td>
+              <span class="score-badge score-mid">
+                64.4
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Business Development Associate</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Clovirtualfashion <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>emerging technology</span><span class='skill-tag'>stakeholder management</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/clovirtualfashion/8361b296-c266-42dc-86b3-4e280e3a89b8" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="revenue operations manager - emea" data-company="launchdarkly" data-scope="remote-eu" data-kind="auto" data-skills="salesforce saas business requirements stakeholder management customer success gtm">
+            <td>
+              <span class="score-badge score-mid">
+                63.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Revenue Operations Manager - EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">LaunchDarkly </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Worldwide)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>business requirements</span><span class='skill-tag'>stakeholder management</span><span class='skill-tag'>customer success</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/launchdarkly/jobs/8043300003" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="technical account manager (technical advisory)" data-company="sonarsource" data-scope="remote-eu" data-kind="auto" data-skills="servicenow">
+            <td>
+              <span class="score-badge score-mid">
+                62.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Technical Account Manager (Technical Advisory)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">SonarSource </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Europe)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>ServiceNow</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/sonarsource/6a14c04a-02fe-4fad-929c-9f854c6f06bb" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success manager" data-company="xyz reality" data-scope="remote-eu" data-kind="auto" data-skills="customer success">
+            <td>
+              <span class="score-badge score-mid">
+                62.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Xyz Reality <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">United Kingdom; Europe (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/xyz-reality/59af0522-c2a6-452e-ab4e-eaa00dfae3b9" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="business analyst (f/m/d)" data-company="allianz global investors gmbh" data-scope="munich" data-kind="unknown" data-skills="business analysis user stories agile">
+            <td>
+              <span class="score-badge score-mid">
+                62.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Business Analyst (f/m/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Allianz Global Investors GmbH </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">80335 München, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>business analysis</span><span class='skill-tag'>user stories</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill ">email</span>
+            </td>
+            <td>
+              <a href="mailto:recruiting@allianzgi.com" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="account manager, commercial (emea)" data-company="fal ai" data-scope="remote-eu" data-kind="auto" data-skills="salesforce saas customer success">
+            <td>
+              <span class="score-badge score-mid">
+                62.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Account Manager, Commercial (EMEA)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Fal Ai </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Turkey (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/fal-ai/f1488d67-3e53-4f0c-8803-9c32fc95f309" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="regional sales manager -  germany" data-company="minio" data-scope="remote-de" data-kind="auto" data-skills="salesforce saas cross-functional collaboration customer success">
+            <td>
+              <span class="score-badge score-mid">
+                62.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Regional Sales Manager -  Germany</div>
+              <div style="font-size: 12px; color: var(--text-muted);">MinIO <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>cross-functional collaboration</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/minio/jobs/5451580008" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="sales manager - weather &amp; climate (emea &amp; apac)" data-company="spire" data-scope="remote-eu" data-kind="auto" data-skills="salesforce crm saas customer success">
+            <td>
+              <span class="score-badge score-mid">
+                61.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Sales Manager - Weather &amp; Climate (EMEA &amp; APAC)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">spire </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote - Based in Europe</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://spire.com/careers/job-openings/job/?gh_jid=8001327&amp;gh_jid=8001327" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="enterprise account manager - east region (saudi national)" data-company="beyondtrust" data-scope="munich" data-kind="auto" data-skills="salesforce saas go-to-market">
+            <td>
+              <span class="score-badge score-mid">
+                60.5
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Enterprise Account Manager - East Region (Saudi National)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">BeyondTrust </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>go-to-market</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/beyondtrust/jobs/8132356" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="enterprise account executive - emea" data-company="zello" data-scope="munich" data-kind="auto" data-skills="hubspot crm saas customer success">
+            <td>
+              <span class="score-badge score-mid">
+                60.3
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Enterprise Account Executive - EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Zello </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/Zello/4c7a4c02-fa89-4d59-aec0-a0d61da01a06" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="technical pre-sales solution engineer (f/m/d)" data-company="neuverge tron" data-scope="munich" data-kind="auto" data-skills="workshops pre-sales presales">
+            <td>
+              <span class="score-badge score-mid">
+                60.1
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Technical Pre-sales Solution Engineer (f/m/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Neuverge Tron </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>workshops</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>presales</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/neuverge-tron/ee3fb647-2d66-4f5c-8161-49eee78620c3" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="system test automation engineer" data-company="wayve" data-scope="munich" data-kind="auto" data-skills="agentic ai workshops ci/cd git gitlab azure">
+            <td>
+              <span class="score-badge score-base">
+                59.2
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">System Test Automation Engineer</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Wayve </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Leonberg, Germany (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Agentic AI</span><span class='skill-tag'>workshops</span><span class='skill-tag'>CI/CD</span><span class='skill-tag'>Git</span><span class='skill-tag'>GitLab</span><span class='skill-tag'>Azure</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/wayve/cf7dee5e-25cf-4284-8435-cfbcae4deb9c" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="applied ai engineer, codex" data-company="openai" data-scope="munich" data-kind="auto" data-skills="workshops stakeholder management python">
+            <td>
+              <span class="score-badge score-base">
+                58.9
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Applied AI Engineer, Codex</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Openai </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>workshops</span><span class='skill-tag'>stakeholder management</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/openai/6a7cedbd-0a7c-4f3e-8389-55357ad444b3" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="crm manager (all genders)" data-company="clockin gmbh" data-scope="munich" data-kind="unknown" data-skills="hubspot crm customer success">
+            <td>
+              <span class="score-badge score-base">
+                58.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">CRM Manager (all genders)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">clockin GmbH </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">München, Deutschland</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill ">company_site</span>
+            </td>
+            <td>
+              <a href="https://jobs.clockin.de/o/crm-manager-all-genders" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="sales enablement manager" data-company="canonical" data-scope="remote-eu" data-kind="unknown" data-skills="salesforce crm gtm azure">
+            <td>
+              <span class="score-badge score-base">
+                58.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Sales Enablement Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Canonical </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">EMEA</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>GTM</span><span class='skill-tag'>Azure</span>
+            </td>
+            <td>
+              <span class="pill ">company_site</span>
+            </td>
+            <td>
+              <a href="https://canonical.com/careers/diversity/identity" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="partnerships manager (m/f/d)" data-company="blueocean technologies gmbh" data-scope="munich" data-kind="auto" data-skills="crm customer success">
+            <td>
+              <span class="score-badge score-base">
+                58.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Partnerships Manager (m/f/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Blueocean Technologies Gmbh </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">personio</span>
+            </td>
+            <td>
+              <a href="https://blueocean-technologies-gmbh.jobs.personio.de/job/2875610" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="sales manager – aviation, middle east &amp; asia-pacific" data-company="spire" data-scope="munich" data-kind="auto" data-skills="salesforce crm saas customer success">
+            <td>
+              <span class="score-badge score-base">
+                57.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Sales Manager – Aviation, Middle East &amp; Asia-Pacific</div>
+              <div style="font-size: 12px; color: var(--text-muted);">spire </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://spire.com/careers/job-openings/job/?gh_jid=8173583&amp;gh_jid=8173583" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="enterprise account executive - namer" data-company="legion" data-scope="munich" data-kind="auto" data-skills="salesforce crm saas gtm">
+            <td>
+              <span class="score-badge score-base">
+                57.5
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Enterprise Account Executive - NAMER</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Legion <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">email</span>
+            </td>
+            <td>
+              <a href="mailto:recruiting@legion.co" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior product manager" data-company="neuverge tron" data-scope="munich" data-kind="auto" data-skills="saas requirements analysis stakeholder management solution design cross-functional collaboration agile">
+            <td>
+              <span class="score-badge score-base">
+                56.9
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Product Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Neuverge Tron </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>requirements analysis</span><span class='skill-tag'>stakeholder management</span><span class='skill-tag'>solution design</span><span class='skill-tag'>cross-functional collaboration</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/neuverge-tron/ac70302c-1b60-4bda-8c3b-d1cc0c108160" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="customer success associate" data-company="lyceum" data-scope="remote-de" data-kind="auto" data-skills="saas customer success">
+            <td>
+              <span class="score-badge score-base">
+                56.9
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Customer Success Associate</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Lyceum <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/lyceum/ec223b92-b51b-47a9-babb-88d134b6d76e" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="middle full-stack developer (next.js)" data-company="ruby labs" data-scope="remote-eu" data-kind="auto" data-skills="rest apis rest api crm mcp git">
+            <td>
+              <span class="score-badge score-base">
+                56.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Middle Full-Stack Developer (Next.js)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Ruby Labs </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Ukraine; North Macedonia; Turkey; European Union; Serbia; Bosnia; Georgia (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>REST APIs</span><span class='skill-tag'>REST API</span><span class='skill-tag'>CRM</span><span class='skill-tag'>MCP</span><span class='skill-tag'>Git</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/ruby-labs/dad7e7c6-3cb6-428f-83ea-332d2e559387" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="solutions consultant, digital assets" data-company="certik" data-scope="remote-eu" data-kind="auto" data-skills="workshops">
+            <td>
+              <span class="score-badge score-base">
+                55.9
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Solutions Consultant, Digital Assets</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Certik </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">EU (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>workshops</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/certik/5f14741f-4154-40cc-abea-9d3d5f348d0a" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="forward deployed engineer, sap" data-company="causaprima" data-scope="munich" data-kind="auto" data-skills="saas workshops gtm python">
+            <td>
+              <span class="score-badge score-base">
+                55.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Forward Deployed Engineer, SAP</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Causaprima </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Madrid; Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>workshops</span><span class='skill-tag'>GTM</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/causaprima/ee786fde-55eb-42da-b9f2-09a1fc2619a5" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="scientific software engineer (lab integration)" data-company="cuspai" data-scope="remote-de" data-kind="auto" data-skills="event-driven ci/cd python">
+            <td>
+              <span class="score-badge score-base">
+                55.6
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Scientific Software Engineer (Lab Integration)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Cuspai </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">London, UK; Amsterdam, NL; Berlin, DE; Cambridge, UK (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>event-driven</span><span class='skill-tag'>CI/CD</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/cuspai/efcaa040-870e-4786-97e2-d88bfb0e4498" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="solutions architect" data-company="vercel" data-scope="munich" data-kind="auto" data-skills="saas workshops azure">
+            <td>
+              <span class="score-badge score-base">
+                55.4
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Solutions Architect</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Vercel </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Hybrid - London, Berlin</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>workshops</span><span class='skill-tag'>Azure</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/vercel/jobs/5796302004" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="domain architect digital roadmapping and ai solutions (f/m/div) hrc1828856" data-company="infineon technologies ag" data-scope="munich" data-kind="unknown" data-skills="generative ai business requirements stakeholder management customer success">
+            <td>
+              <span class="score-badge score-base">
+                55.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Domain Architect Digital Roadmapping and AI Solutions (f/m/div) HRC1828856</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Infineon Technologies AG </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">85579 Neubiberg, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Generative AI</span><span class='skill-tag'>business requirements</span><span class='skill-tag'>stakeholder management</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill ">company_site</span>
+            </td>
+            <td>
+              <a href="https://www.infineon.com/cms/en/careers/diversity-and-inclusion/" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="business development representative, middle east" data-company="chainguard" data-scope="remote-eu" data-kind="auto" data-skills="salesforce hubspot crm business requirements">
+            <td>
+              <span class="score-badge score-base">
+                55.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Business Development Representative, Middle East</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Chainguard <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Europe - Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>business requirements</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/chainguard/jobs/4722928006" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="enterprise account executive" data-company="elastic" data-scope="munich" data-kind="auto" data-skills="crm saas customer success">
+            <td>
+              <span class="score-badge score-base">
+                54.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Enterprise Account Executive</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Elastic </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://jobs.elastic.co/jobs?gh_jid=8176627&amp;gh_jid=8176627" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="technical account management (tam) leader" data-company="supabase" data-scope="remote-eu" data-kind="auto" data-skills="hubspot cross-functional collaboration customer success">
+            <td>
+              <span class="score-badge score-base">
+                54.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Technical Account Management (TAM) Leader</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Supabase </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Anywhere</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>cross-functional collaboration</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/supabase/f52fd120-5fbe-4e0d-949d-01e217ec77d6" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="key account executive - europe" data-company="colabsoftware" data-scope="remote-eu" data-kind="auto" data-skills="salesforce saas customer success">
+            <td>
+              <span class="score-badge score-base">
+                54.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Key Account Executive - Europe</div>
+              <div style="font-size: 12px; color: var(--text-muted);">colabsoftware <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Europe, Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/colabsoftware/jobs/5443466008" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="ai transformation architect emea" data-company="unframe" data-scope="remote-de" data-kind="auto" data-skills="ai transformation pre-sales">
+            <td>
+              <span class="score-badge score-base">
+                53.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">AI Transformation Architect EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Unframe <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin, Berlin, Germany; Germany Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>AI transformation</span><span class='skill-tag'>pre-sales</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.eu.greenhouse.io/unframe/jobs/5010240101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="technical account manager, emea" data-company="hightouch inc" data-scope="remote-eu" data-kind="auto" data-skills="customer success">
+            <td>
+              <span class="score-badge score-base">
+                53.2
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Technical Account Manager, EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Hightouch Inc </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Europe)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/hightouch-inc/cdf151e2-3093-4871-963b-65277cb40a75" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="gtm engineer, growth &amp; plg" data-company="lemlist" data-scope="remote-eu" data-kind="auto" data-skills="crm mcp gtm">
+            <td>
+              <span class="score-badge score-base">
+                53.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">GTM engineer, Growth &amp; PLG</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Lemlist </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">European union (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>MCP</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/lemlist/4780f8ba-41be-42c7-9981-35938d12cc76" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="fullstack software engineer - core" data-company="dataiku" data-scope="munich" data-kind="auto" data-skills="saas cross-functional collaboration azure python">
+            <td>
+              <span class="score-badge score-base">
+                53.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Fullstack Software Engineer - Core</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Dataiku </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">France,  Germany,  Netherlands,  Spain,  UK</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>cross-functional collaboration</span><span class='skill-tag'>Azure</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/dataiku/jobs/5420293004" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="sales development representative" data-company="unframe" data-scope="munich" data-kind="auto" data-skills="salesforce crm saas go-to-market">
+            <td>
+              <span class="score-badge score-base">
+                53.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Sales Development Representative</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Unframe <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin, Berlin, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>go-to-market</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.eu.greenhouse.io/unframe/jobs/4929697101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="ai engineer - rl post-training and agentic systems" data-company="vesoma" data-scope="munich" data-kind="auto" data-skills="middleware python">
+            <td>
+              <span class="score-badge score-base">
+                52.6
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">AI Engineer - RL Post-Training and Agentic Systems</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Vesoma <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>middleware</span><span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">personio</span>
+            </td>
+            <td>
+              <a href="https://vesoma.jobs.personio.de/job/2869701" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="specialist account executive, secops" data-company="zscaler" data-scope="munich" data-kind="auto" data-skills="generative ai go-to-market agile">
+            <td>
+              <span class="score-badge score-base">
+                52.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Specialist Account Executive, SecOps</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Zscaler </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Generative AI</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/zscaler/jobs/5290005007" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="product growth manager" data-company="nelly" data-scope="remote-de" data-kind="auto" data-skills="saas cross-functional collaboration customer success gtm">
+            <td>
+              <span class="score-badge score-base">
+                52.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Product Growth Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Nelly <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>cross-functional collaboration</span><span class='skill-tag'>customer success</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/nelly/e1974165-2055-48f1-918c-5e8cc66358e0" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior full-stack developer (next.js)" data-company="ruby labs" data-scope="remote-eu" data-kind="auto" data-skills="rest apis rest api crm mcp git">
+            <td>
+              <span class="score-badge score-base">
+                51.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Full-Stack Developer (Next.js)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Ruby Labs </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Ukraine; North Macedonia; Turkey; European Union; Serbia; Bosnia; Georgia (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>REST APIs</span><span class='skill-tag'>REST API</span><span class='skill-tag'>CRM</span><span class='skill-tag'>MCP</span><span class='skill-tag'>Git</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/ruby-labs/e91e9b7a-9317-4cf2-a102-90e1c2c83366" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="solutions architect" data-company="rev star" data-scope="remote-eu" data-kind="auto" data-skills="genai pre-sales presales">
+            <td>
+              <span class="score-badge score-base">
+                51.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Solutions Architect</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Rev Star </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Europe)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>GenAI</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>presales</span>
+            </td>
+            <td>
+              <span class="pill success">workable</span>
+            </td>
+            <td>
+              <a href="https://apply.workable.com/j/7C70A921DE" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior technical project manager" data-company="mongodb" data-scope="munich" data-kind="auto" data-skills="genai stakeholder management customer success azure agile scrum">
+            <td>
+              <span class="score-badge score-base">
+                50.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Technical Project Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">MongoDB </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>GenAI</span><span class='skill-tag'>stakeholder management</span><span class='skill-tag'>customer success</span><span class='skill-tag'>Azure</span><span class='skill-tag'>Agile</span><span class='skill-tag'>Scrum</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://www.mongodb.com/careers/job/?gh_jid=8355268" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="technical product manager (data integrations)" data-company="orcrist technologies" data-scope="munich" data-kind="auto" data-skills="ipaas saas workshops customer success postman">
+            <td>
+              <span class="score-badge score-base">
+                50.6
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Technical Product Manager (Data Integrations)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Orcrist Technologies </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote / Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>iPaaS</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>workshops</span><span class='skill-tag'>customer success</span><span class='skill-tag'>Postman</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.eu.greenhouse.io/orcristtechnologies/jobs/5017454101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior backend engineer - gateway (java, aws, dynamodb)" data-company="ppro" data-scope="remote-de" data-kind="auto" data-skills="event-driven rest apis agile">
+            <td>
+              <span class="score-badge score-base">
+                49.6
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Backend Engineer - Gateway (Java, AWS, DynamoDB)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Ppro </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>event-driven</span><span class='skill-tag'>REST APIs</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/ppro/2c3070f4-3666-4cab-999f-f3b8321bba26" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="account executive (ae) – enterprise sales international (m/w/d)" data-company="boardwise" data-scope="munich" data-kind="auto" data-skills="hubspot crm saas workshops">
+            <td>
+              <span class="score-badge score-base">
+                49.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Account Executive (AE) – Enterprise Sales International (m/w/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Boardwise </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>workshops</span>
+            </td>
+            <td>
+              <span class="pill success">personio</span>
+            </td>
+            <td>
+              <a href="https://boardwise.jobs.personio.de/job/2860799" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="account manager emea" data-company="runpod" data-scope="remote-eu" data-kind="auto" data-skills="hubspot crm">
+            <td>
+              <span class="score-badge score-base">
+                48.9
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Account Manager EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Runpod <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote - EMEA; Remote - EMEA</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/runpod/04f76112-abc3-4327-b1ed-9cde3cc1c404" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior product manager (workflows &amp; integrations)" data-company="pencil" data-scope="remote-eu" data-kind="auto" data-skills="saas agentic ai generative ai genai">
+            <td>
+              <span class="score-badge score-base">
+                48.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Product Manager (Workflows &amp; Integrations)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Pencil </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">EMEA (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>Agentic AI</span><span class='skill-tag'>Generative AI</span><span class='skill-tag'>GenAI</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/pencil/46d1d294-3c96-42e0-83cc-de6d995255e6" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="partner sales engineer" data-company="chainguard" data-scope="remote-de" data-kind="auto" data-skills="workshops go-to-market azure">
+            <td>
+              <span class="score-badge score-base">
+                47.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Partner Sales Engineer</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Chainguard <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany - Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>workshops</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>Azure</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.greenhouse.io/chainguard/jobs/4701683006" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="business development manager" data-company="tactiliarobotics" data-scope="munich" data-kind="auto" data-skills="workshops pre-sales go-to-market">
+            <td>
+              <span class="score-badge score-base">
+                47.4
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Business Development Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Tactiliarobotics <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>workshops</span><span class='skill-tag'>pre-sales</span><span class='skill-tag'>go-to-market</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/tactiliarobotics/b03b38e7-0afb-466e-84ed-4f48256f0df8" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="marketing manager - benelux" data-company="light inc" data-scope="munich" data-kind="auto" data-skills="saas customer success gtm">
+            <td>
+              <span class="score-badge score-base">
+                47.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Marketing Manager - Benelux</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Light Inc </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">London; Munich; Copenhagen (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/light-inc/2dcf9ade-f49d-46b9-b7a4-a865f206f645" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="(senior) product marketing manager (m/f/d)" data-company="kayzen" data-scope="remote-eu" data-kind="auto" data-skills="hubspot customer success gtm">
+            <td>
+              <span class="score-badge score-base">
+                47.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">(Senior) Product Marketing Manager (m/f/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Kayzen <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote EMEA</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>HubSpot</span><span class='skill-tag'>customer success</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.eu.greenhouse.io/kayzen/jobs/5029934101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="enterprise systems consultant" data-company="crosslaketech" data-scope="remote-eu" data-kind="auto" data-skills="salesforce crm enterprise applications">
+            <td>
+              <span class="score-badge score-base">
+                47.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Enterprise Systems Consultant</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Crosslaketech </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Europe)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span><span class='skill-tag'>enterprise applications</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/crosslaketech/a1d654b9-83f6-412a-8f39-4affc1bf403b" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="managed services atlassian consultant" data-company="valiantys" data-scope="remote-de" data-kind="auto" data-skills="workshops customer success">
+            <td>
+              <span class="score-badge score-base">
+                46.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Managed Services Atlassian Consultant</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Valiantys </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin, Berlin, Germany; Munich, Bavaria, Germany; Frankfort, Hesse, Germany; Dortmund, North Rhine-Westphalia, Germany; Essen, North Rhine-Westphalia, Germany; Leipzig, Saxony, Germany; Remote, Germany; Stuttgart, Bade-Wurtemberg, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>workshops</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/valiantys/f0c0e6ca-82d3-44e7-b4a7-5c530b3e305d" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="product manager - realtime" data-company="supabase" data-scope="remote-eu" data-kind="auto" data-skills="event-driven saas customer success gtm">
+            <td>
+              <span class="score-badge score-base">
+                46.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Product Manager - Realtime</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Supabase </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Anywhere</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>event-driven</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/supabase/bd5ce178-84c9-469e-89f4-493c21b50622" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="cloud partner sales manager  (northeast)" data-company="cribl" data-scope="munich" data-kind="unknown" data-skills="saas customer success go-to-market azure">
+            <td>
+              <span class="score-badge score-base">
+                46.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Cloud Partner Sales Manager  (Northeast)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Cribl </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>Azure</span>
+            </td>
+            <td>
+              <span class="pill ">company_site</span>
+            </td>
+            <td>
+              <a href="https://cribl.io/job-detail/?gh_jid=6225541004" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="sales enablement manager, onchain compliance" data-company="trm labs" data-scope="munich" data-kind="auto" data-skills="saas go-to-market gtm">
+            <td>
+              <span class="score-badge score-base">
+                46.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Sales Enablement Manager, Onchain Compliance</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Trm Labs <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">London, United Kingdom; Prague, Czech Republic; Brussels, Belgium; Amsterdam, Netherlands; United States; Paris, France; São Paulo, Brazil; Munich, Germany; Helsinki, Finland; Lisbon, Portugal; Madrid, Spain (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>GTM</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/trm-labs/bd844e99-8211-4e0a-aeb5-fb78f174fa17" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="lead generation marketing manager" data-company="constellr gmbh" data-scope="munich" data-kind="auto" data-skills="salesforce hubspot crm saas agile">
+            <td>
+              <span class="score-badge score-base">
+                46.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Lead Generation Marketing Manager</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Constellr GmbH <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany | Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>HubSpot</span><span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.eu.greenhouse.io/constellrgmbh/jobs/4995767101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="deployment strategist, public sector (emea)" data-company="trm labs" data-scope="remote-eu" data-kind="auto" data-skills="salesforce customer success">
+            <td>
+              <span class="score-badge score-base">
+                45.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Deployment Strategist, Public Sector (EMEA)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Trm Labs <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">EMEA (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/trm-labs/fbba5535-fcc7-4350-ba81-6b6eeddb41c7" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="manager, customer onboarding &amp;amp; success" data-company="veracode" data-scope="munich" data-kind="unknown" data-skills="saas stakeholder management customer success">
+            <td>
+              <span class="score-badge score-base">
+                45.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Manager, Customer Onboarding &amp;amp; Success</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Veracode </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote (Germany eligible)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>SaaS</span><span class='skill-tag'>stakeholder management</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill ">email</span>
+            </td>
+            <td>
+              <a href="mailto:careers@veracode.com" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="account executive, commercial (emea)" data-company="fal ai" data-scope="remote-eu" data-kind="auto" data-skills="salesforce saas generative ai">
+            <td>
+              <span class="score-badge score-base">
+                45.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Account Executive, Commercial (EMEA)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Fal Ai </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Turkey (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>Generative AI</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/fal-ai/7e6adafa-9014-4363-b91f-8fa0c0074c93" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior business development manager – public sector" data-company="constellr gmbh" data-scope="munich" data-kind="auto" data-skills="crm go-to-market agile">
+            <td>
+              <span class="score-badge score-base">
+                45.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Business Development Manager – Public Sector</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Constellr GmbH <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany | Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>go-to-market</span><span class='skill-tag'>Agile</span>
+            </td>
+            <td>
+              <span class="pill success">greenhouse</span>
+            </td>
+            <td>
+              <a href="https://job-boards.eu.greenhouse.io/constellrgmbh/jobs/4995799101" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="solutions architect - emea" data-company="scoreplay" data-scope="remote-eu" data-kind="auto" data-skills="solution design pre-sales">
+            <td>
+              <span class="score-badge score-base">
+                45.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Solutions Architect - EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Scoreplay <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Western Europe - Remote</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>solution design</span><span class='skill-tag'>pre-sales</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/scoreplay/9f6385a5-357f-4792-93c4-3358a2772989" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="manager of implementations, high touch - emea" data-company="ashby" data-scope="remote-de" data-kind="auto" data-skills="cross-functional collaboration customer success go-to-market">
+            <td>
+              <span class="score-badge score-base">
+                44.3
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Manager of Implementations, High Touch - EMEA</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Ashby </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Remote - European Union; United Kingdom; Birmingham; Bristol; Germany; Ireland; Spain</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>cross-functional collaboration</span><span class='skill-tag'>customer success</span><span class='skill-tag'>go-to-market</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/Ashby/35a01a05-8efd-4bc3-a4bf-0a31d902102d" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="rf integration specialist (m/f/d)" data-company="quantum-systems gmbh" data-scope="munich" data-kind="unknown" data-skills="">
+            <td>
+              <span class="score-badge score-base">
+                44.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">RF Integration Specialist (m/f/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Quantum-Systems GmbH <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Gilching, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              
+            </td>
+            <td>
+              <span class="pill ">company_site</span>
+            </td>
+            <td>
+              <a href="https://career.quantum-systems.com/o/rf-integration-specialist-mfd" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="product manager (m/f/d) – autonomous asset management | asset investment planning" data-company="sap it business systeme" data-scope="munich" data-kind="auto" data-skills="enterprise applications agentic ai generative ai">
+            <td>
+              <span class="score-badge score-base">
+                44.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Product Manager (m/f/d) – Autonomous Asset Management | Asset Investment Planning</div>
+              <div style="font-size: 12px; color: var(--text-muted);">SAP IT Business Systeme </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Garching bei München, Bavaria, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>enterprise applications</span><span class='skill-tag'>Agentic AI</span><span class='skill-tag'>Generative AI</span>
+            </td>
+            <td>
+              <span class="pill success">smartrecruiters</span>
+            </td>
+            <td>
+              <a href="https://jobs.smartrecruiters.com/sapitbusinesssysteme/744000158255293" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="account manager - new logo (italian or french speaking)" data-company="renesas electronics" data-scope="munich" data-kind="auto" data-skills="salesforce crm">
+            <td>
+              <span class="score-badge score-base">
+                44.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Account Manager - New Logo (Italian or French speaking)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Renesas Electronics </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, BY, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Salesforce</span><span class='skill-tag'>CRM</span>
+            </td>
+            <td>
+              <span class="pill success">smartrecruiters</span>
+            </td>
+            <td>
+              <a href="https://jobs.smartrecruiters.com/renesaselectronics/744000157838469" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="(senior) business analyst (f/m/d)" data-company="adjoe" data-scope="remote-de" data-kind="auto" data-skills="">
+            <td>
+              <span class="score-badge score-base">
+                44.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">(Senior) Business Analyst (f/m/d)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Adjoe </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Hamburg (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/adjoe/00e62ecd-ed29-4988-9672-d8f6cb2d423d" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="ai engineer - simulation environments" data-company="vesoma" data-scope="munich" data-kind="auto" data-skills="python">
+            <td>
+              <span class="score-badge score-base">
+                43.8
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">AI Engineer - Simulation Environments</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Vesoma <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">personio</span>
+            </td>
+            <td>
+              <a href="https://vesoma.jobs.personio.de/job/2869707" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior backend engineer" data-company="egym" data-scope="remote-de" data-kind="auto" data-skills="event-driven ci/cd">
+            <td>
+              <span class="score-badge score-base">
+                43.4
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior backend Engineer</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Egym </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Berlin (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-de</div>
+            </td>
+            <td>
+              <span class='skill-tag'>event-driven</span><span class='skill-tag'>CI/CD</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/egym/31e7f2b4-d7a0-41f8-8781-f8f3573849c6" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="partner solutions architect , ai builder" data-company="supabase" data-scope="remote-eu" data-kind="auto" data-skills="mcp workshops">
+            <td>
+              <span class="score-badge score-base">
+                43.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Partner Solutions Architect , AI Builder</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Supabase </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Anywhere</span>
+              <div style="font-size: 11px; color: var(--accent);">remote-eu</div>
+            </td>
+            <td>
+              <span class='skill-tag'>MCP</span><span class='skill-tag'>workshops</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/supabase/282d1dfb-b162-4ce4-a938-c4b2173230e0" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="ai engineer - large scale pre-training" data-company="vesoma" data-scope="munich" data-kind="auto" data-skills="python">
+            <td>
+              <span class="score-badge score-base">
+                42.6
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">AI Engineer - Large Scale Pre-Training</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Vesoma <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>Python</span>
+            </td>
+            <td>
+              <span class="pill success">personio</span>
+            </td>
+            <td>
+              <a href="https://vesoma.jobs.personio.de/job/2869693" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="applied ai engineer, startups (codex)" data-company="openai" data-scope="munich" data-kind="auto" data-skills="workshops">
+            <td>
+              <span class="score-badge score-base">
+                42.3
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Applied AI Engineer, Startups (Codex)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Openai <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany (Remote)</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>workshops</span>
+            </td>
+            <td>
+              <span class="pill success">ashby</span>
+            </td>
+            <td>
+              <a href="https://jobs.ashbyhq.com/openai/e522c734-6e4e-4d69-80c1-d09d5144eab4" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="business analyst [ger]" data-company="integration consulting" data-scope="munich" data-kind="unknown" data-skills="">
+            <td>
+              <span class="score-badge score-base">
+                42.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Business Analyst [GER]</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Integration Consulting <span class="pill" style="padding:1px 5px; font-size:10px;">startup</span></div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Munich, Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              
+            </td>
+            <td>
+              <span class="pill ">company_site</span>
+            </td>
+            <td>
+              <a href="https://careers.integrationconsulting.com/o/business-analyst-ger" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+          <tr data-title="senior account executive (government, defense &amp; intelligence)" data-company="kpler" data-scope="munich" data-kind="auto" data-skills="crm saas customer success">
+            <td>
+              <span class="score-badge score-base">
+                42.0
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #fff;">Senior Account Executive (Government, Defense &amp; Intelligence)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Kpler </div>
+            </td>
+            <td>
+              <span style="font-size: 12px;">Germany</span>
+              <div style="font-size: 11px; color: var(--accent);">munich</div>
+            </td>
+            <td>
+              <span class='skill-tag'>CRM</span><span class='skill-tag'>SaaS</span><span class='skill-tag'>customer success</span>
+            </td>
+            <td>
+              <span class="pill success">lever</span>
+            </td>
+            <td>
+              <a href="https://jobs.lever.co/kpler/a3313f7b-a0d7-425f-94b5-0fb43a571820" target="_blank" class="btn">Apply &rarr;</a>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 4: SOURCES -->
+  <div id="tab-sources" class="tab-pane">
+    <div class="panel">
+      <div class="section-title">🌐 Ingestion Source Conversion Matrix</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Source</th>
+            <th>Total Scraped</th>
+            <th>Passing Roles</th>
+            <th>Yield Rate</th>
+            <th>Conversion Bar</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><strong>ashby</strong></td>
+            <td>2909</td>
+            <td><strong style="color: var(--success);">107</strong></td>
+            <td>3.7%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 14.8%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>greenhouse</strong></td>
+            <td>6430</td>
+            <td><strong style="color: var(--success);">100</strong></td>
+            <td>1.6%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 6.4%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>recruitee</strong></td>
+            <td>6478</td>
+            <td><strong style="color: var(--success);">39</strong></td>
+            <td>0.6%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 2.4%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>weworkremotely</strong></td>
+            <td>117</td>
+            <td><strong style="color: var(--success);">33</strong></td>
+            <td>28.2%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 100%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>personio</strong></td>
+            <td>653</td>
+            <td><strong style="color: var(--success);">28</strong></td>
+            <td>4.3%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 17.2%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>jobicy</strong></td>
+            <td>321</td>
+            <td><strong style="color: var(--success);">26</strong></td>
+            <td>8.1%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 32.4%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>lever</strong></td>
+            <td>679</td>
+            <td><strong style="color: var(--success);">22</strong></td>
+            <td>3.2%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 12.8%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>smartrecruiters</strong></td>
+            <td>1197</td>
+            <td><strong style="color: var(--success);">17</strong></td>
+            <td>1.4%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 5.6%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>arbeitnow</strong></td>
+            <td>4145</td>
+            <td><strong style="color: var(--success);">15</strong></td>
+            <td>0.4%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 1.6%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>himalayas</strong></td>
+            <td>14</td>
+            <td><strong style="color: var(--success);">9</strong></td>
+            <td>64.3%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 100%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>teamtailor</strong></td>
+            <td>392</td>
+            <td><strong style="color: var(--success);">7</strong></td>
+            <td>1.8%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 7.2%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>arbeitsagentur</strong></td>
+            <td>104</td>
+            <td><strong style="color: var(--success);">4</strong></td>
+            <td>3.8%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 15.2%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>remoteok</strong></td>
+            <td>23</td>
+            <td><strong style="color: var(--success);">3</strong></td>
+            <td>13.0%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 52.0%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>germantechjobs</strong></td>
+            <td>3</td>
+            <td><strong style="color: var(--success);">3</strong></td>
+            <td>100.0%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 100%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>englishjobsde</strong></td>
+            <td>341</td>
+            <td><strong style="color: var(--success);">2</strong></td>
+            <td>0.6%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 2.4%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>amazon_jobs</strong></td>
+            <td>2</td>
+            <td><strong style="color: var(--success);">2</strong></td>
+            <td>100.0%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 100%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>munichstartup</strong></td>
+            <td>7</td>
+            <td><strong style="color: var(--success);">1</strong></td>
+            <td>14.3%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 57.2%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>remotive</strong></td>
+            <td>3</td>
+            <td><strong style="color: var(--success);">1</strong></td>
+            <td>33.3%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 100%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>softgarden</strong></td>
+            <td>1</td>
+            <td><strong style="color: var(--success);">1</strong></td>
+            <td>100.0%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 100%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>workable</strong></td>
+            <td>656</td>
+            <td><strong style="color: var(--text-dim);">0</strong></td>
+            <td>0.0%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 0.0%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>stepstone</strong></td>
+            <td>396</td>
+            <td><strong style="color: var(--text-dim);">0</strong></td>
+            <td>0.0%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 0.0%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>pinpoint</strong></td>
+            <td>3</td>
+            <td><strong style="color: var(--text-dim);">0</strong></td>
+            <td>0.0%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 0.0%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><strong>xing</strong></td>
+            <td>1</td>
+            <td><strong style="color: var(--text-dim);">0</strong></td>
+            <td>0.0%</td>
+            <td>
+              <div class="bar-track" style="width: 150px;">
+                <div class="bar-fill" style="width: 0.0%;"></div>
+              </div>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 5: GATES FUNNEL -->
+  <div id="tab-gates" class="tab-pane">
+    <div class="panel">
+      <div class="section-title">🛑 Candidate Gate Drop Funnel</div>
+      <div class="subhead" style="margin-bottom: 16px;">Breakdown of why postings were dropped and sample role titles per gate.</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Gate Reason</th>
+            <th>Rejected Count</th>
+            <th>Share of DB</th>
+            <th>Sample Rejected Postings</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><span class="pill ">location</span></td>
+            <td><strong>18793</strong></td>
+            <td>75.5%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>Nscaleoperationsukltd</strong>: Senior Network Engineer – Deployment (-)<br>• <strong>Tether Operations Limited</strong>: Junior Project Manager (Keet P2P) (100% remote) (Santiago de Chile, Chile (Remote))<br>• <strong>Tether Operations Limited</strong>: Senior Business Analyst Mining (100% remote) (Santiago de Chile, Chile (Remote))
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill ">role-rules</span></td>
+            <td><strong>3301</strong></td>
+            <td>13.3%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>TECOSIM GmbH</strong>: Production Engineer (all genders) (Taufkirchen, Deutschland)<br>• <strong>Wimex-Gruppe</strong>: selbstständiger Handelsvertreter (m/w/d) Vertrieb landwirtschaftliche Software (München, Deutschland (Remote))<br>• <strong>TransPerfect</strong>: Linguist (Anywhere in EMEA region, United Kingdom (Remote))
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill ">seniority</span></td>
+            <td><strong>794</strong></td>
+            <td>3.2%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>everdrop GmbH</strong>: Intern/ Working Student Influencer &amp; Performance Marketing – Dutch Market (m/f/d) (München, Germany)<br>• <strong>Anton Robotics</strong>: Founding Engineer - Robotics Swiss Army Knife (Munich)<br>• <strong>Vialytics</strong>: Chief of Staff to the CEO (m/f/d) (Remote)
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill ">skip-list</span></td>
+            <td><strong>322</strong></td>
+            <td>1.3%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>MY Humancapital GmbH</strong>: IT-Support First Level (m/w/d) (Munich)<br>• <strong>Isar Aerospace</strong>: Senior Project Manager - Ground Systems Infrastructure (m/f/d) (Parsdorf, Bavaria, Germany)<br>• <strong>everdrop GmbH</strong>: (Junior) Influencer Marketing Manager - FRANCE (m/f/d) (München, Germany)
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill ">german</span></td>
+            <td><strong>293</strong></td>
+            <td>1.2%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>VertiGIS GmbH</strong>: CloudOps Engineer / Consultant  (m/w/x) (München, Deutschland)<br>• <strong>Easyfairs</strong>: (Junior) Business Development Manager (w/m/d) (Bielefeld, Nordrhein-Westfalen, DE; München, Bayern, DE; Stuttgart, Baden-Württemberg, DE)<br>• <strong>Easyfairs</strong>: Teamleitung Digital Marketing (w/m/d) (München, Bayern, DE)
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill ">dup</span></td>
+            <td><strong>292</strong></td>
+            <td>1.2%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>Samsara</strong>: Enterprise Implementation Consultant - German Fluency (Remote - Germany)<br>• <strong>Agile Robots SE</strong>: Automation Engineer (m/f/d) PLC &amp; Commissioning (Munich, Bavaria, Germany)<br>• <strong>Agile Robots SE</strong>: Electronics Engineer, Customer Support (m/f/d) (Munich, Bavaria, Germany)
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill warning">german_required</span></td>
+            <td><strong>128</strong></td>
+            <td>0.5%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>Apaleo</strong>: Solutions Architect f/m/d (Munich/ remote)<br>• <strong>Baringa</strong>: Consultants to Senior Consultants (m/w/d) - Commodity &amp; Energy Trading (Dusseldorf, Germany; Munich, Germany)<br>• <strong>ecosio</strong>: Solutions Engineer - EDI/e-invoicing (f/m/d) (Austria, Germany, Spain, UK, Italy, Hungary, Portugal, Croatia, France - Remote)
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill ">no-employer-link</span></td>
+            <td><strong>126</strong></td>
+            <td>0.5%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>EVO369.GmbH</strong>: Paketzusteller (m/w/d) (Munich)<br>• <strong>Credit Wellness, LLC</strong>: Inside Sales Contractor (Remote (Germany eligible))<br>• <strong>Pendo</strong>: Senior Pre- &amp;amp; Post-Sales Customer Engineer, Enterprise (Remote (Germany eligible))
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill ">no-description</span></td>
+            <td><strong>27</strong></td>
+            <td>0.1%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>RETR</strong>: Customer Success Manager (Remote (Germany eligible))<br>• <strong>Animore</strong>: Technical Program Manager (F/M/D) (Munich, Germany)<br>• <strong>Teltonika</strong>: Onboarding Engineer - Client Technical Support | Telematics (Munich, Germany)
+              </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td><span class="pill ">contract</span></td>
+            <td><strong>24</strong></td>
+            <td>0.1%</td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                • <strong>IDnow</strong>: (Senior) Product Manager, Trust Platform- Digital Identities (f/m/d) (Berlin, Berlin, Germany; München, Bavaria, Germany; Paris, Paris, France; Rennes, Ille-et-Vilaine, France)<br>• <strong>BOB’S Gastronomie- und Veranstaltungs-GmbH</strong>: Service- und Thekenkraft (m/w/d) BOB&#x27;S im alten Pumpenwerk (Teilzeit) (München, Deutschland)<br>• <strong>Webflow</strong>: Senior Manager, Corporate Sales - West (Remote (Germany eligible))
+              </div>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function openTab(tabId) {
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function filterJobs() {
+  const query = document.getElementById('jobSearch').value.toLowerCase();
+  const scope = document.getElementById('scopeFilter').value;
+  const route = document.getElementById('routeFilter').value;
+  const rows = document.querySelectorAll('#jobsTbody tr');
+
+  rows.forEach(r => {
+    const t = r.getAttribute('data-title') || '';
+    const c = r.getAttribute('data-company') || '';
+    const sk = r.getAttribute('data-skills') || '';
+    const rowScope = r.getAttribute('data-scope') || '';
+    const rowKind = r.getAttribute('data-kind') || '';
+
+    const matchesQuery = !query || t.includes(query) || c.includes(query) || sk.includes(query);
+    const matchesScope = !scope || rowScope === scope;
+    const matchesRoute = !route || (route === 'auto' && rowKind === 'auto');
+
+    if (matchesQuery && matchesScope && matchesRoute) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+}
+</script>
+</body>
+</html>
